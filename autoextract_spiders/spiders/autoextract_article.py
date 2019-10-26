@@ -11,6 +11,17 @@ class ArticleAutoExtract(CrawlerSpider):
     name = 'articles'
     page_type = 'article'
 
+    frontera_settings = {
+        'HCF_PRODUCER_FRONTIER': 'autoextract',
+        'HCF_PRODUCER_SLOT_PREFIX': 'articles',
+        'HCF_PRODUCER_NUMBER_OF_SLOTS': 1,
+        'HCF_PRODUCER_BATCH_SIZE': 100,
+
+        'HCF_CONSUMER_FRONTIER': 'autoextract',
+        'HCF_CONSUMER_SLOT': 'articles0',
+        'HCF_CONSUMER_MAX_REQUESTS': 100,
+    }
+
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
         spider = super().from_crawler(crawler, *args, **kwargs)
@@ -37,7 +48,12 @@ class ArticleAutoExtract(CrawlerSpider):
             self.crawler.stats.inc_value('sources/rss')
             meta = {'source_url': response.meta['source_url'], 'feed_url': feed_url}
             self.crawler.stats.inc_value('x_request/feeds')
-            yield Request(feed_url, meta=meta, callback=self.parse_feed, errback=self.errback_feed)
+            yield Request(
+                feed_url,
+                meta=meta,
+                callback=self.parse_feed,
+                errback=self.errback_feed,
+                dont_filter=True)
 
         # Cycle and follow all the rest of the links
         yield from self._requests_to_follow(response)
@@ -112,7 +128,8 @@ class ArticleAutoExtract(CrawlerSpider):
             yield Request(url,
                           meta={'source_url': source_url, 'feed_url': feed_url},
                           callback=self.parse_page,
-                          errback=self.errback_page)
+                          errback=self.errback_page,
+                          dont_filter=True)
 
     def errback_feed(self, failure):
         """ Feed XML request error """

@@ -253,7 +253,7 @@ class CrawlerSpider(AutoExtractSpider):
         valid_links = []
         for lnk in links:
             host = urlsplit(lnk.url).netloc.lower()
-            if host in self.allowed_domains:
+            if not hasattr(self, 'allowed_domains') or host in self.allowed_domains:
                 valid_links.append(lnk)
         return valid_links
 

@@ -35,13 +35,19 @@ RETRY_HTTP_CODES = [429]
 # More spam from Link Filter Middleware
 # LINK_FILTER_MIDDLEWARE_DEBUG = True
 
+# Frontera settings
+SCHEDULER = 'scrapy_frontera.scheduler.FronteraScheduler'
+BACKEND = 'hcf_backend.HCFBackend'
+
 SPIDER_MIDDLEWARES = {
     'scrapy_link_filter.middleware.LinkFilterMiddleware': 950,
+    'scrapy_frontera.middlewares.SchedulerSpiderMiddleware': 0,
 }
 
 # Enable or disable downloader middlewares
 # See http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
+    'scrapy_frontera.middlewares.SchedulerDownloaderMiddleware': 0,
     'scrapy_crawlera.CrawleraMiddleware': 300,
     'scrapy_count_filter.middleware.GlobalCountFilterMiddleware': 541,
     'scrapy_count_filter.middleware.HostsCountFilterMiddleware': 542,
