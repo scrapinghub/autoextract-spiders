@@ -5,6 +5,8 @@ ujson>=1.34
 PyYAML<=3.13,>=3.10
 
 scrapy-autoextract>=0.1
+scrapy_crawlera~=1.6.0
+crawlera-session==1.0.0
 
 git+https://github.com/croqaz/scrapy-link-filter
 git+https://github.com/croqaz/scrapy-count-filter
