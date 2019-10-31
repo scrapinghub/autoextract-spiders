@@ -1,11 +1,9 @@
-import hashlib
 import logging
 
 from scrapy import signals
 from scrapy.spiders import Spider
 from scrapy.http import Request
 from scrapy.exceptions import IgnoreRequest, DropItem
-from scrapy.utils.request import request_fingerprint
 
 from .util import load_sources, is_valid_url, is_blacklisted_url
 from .util import utc_iso_date, maybe_is_article, maybe_is_product
@@ -37,11 +35,6 @@ class AutoExtractRequest(Request):
             self.meta['autoextract'] = {'enabled': True}
             if page_type:
                 self.meta['autoextract']['pageType'] = page_type
-
-        # Request fingerprint for Frontera requests
-        if meta.get('cf_store') and 'source_url' in meta:
-            fp = request_fingerprint(self).encode()
-            meta['frontier_fingerprint'] = hashlib.sha1(fp).hexdigest()
 
     def __str__(self):
         return f'<AutoExtract {self.url}>'
