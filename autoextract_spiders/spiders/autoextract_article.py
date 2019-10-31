@@ -27,6 +27,8 @@ class ArticleAutoExtract(CrawlerSpider):
         spider = super().from_crawler(crawler, *args, **kwargs)
         spider.main_callback = spider.parse_source
         spider.main_errback = spider.errback_source
+        # A switch to enable revisiting article pages.
+        spider.dont_filter = spider.get_arg('dont-filter', False)
         return spider
 
     @crawlera_session.follow_session
@@ -53,7 +55,7 @@ class ArticleAutoExtract(CrawlerSpider):
                 meta=meta,
                 callback=self.parse_feed,
                 errback=self.errback_feed,
-                dont_filter=True)
+                dont_filter=True)  # parse the feed everytime
 
         # Cycle and follow all the rest of the links
         yield from self._requests_to_follow(response)
@@ -129,7 +131,7 @@ class ArticleAutoExtract(CrawlerSpider):
                           meta={'source_url': source_url, 'feed_url': feed_url},
                           callback=self.parse_page,
                           errback=self.errback_page,
-                          dont_filter=True)
+                          dont_filter=self.dont_filter)
 
     def errback_feed(self, failure):
         """ Feed XML request error """
