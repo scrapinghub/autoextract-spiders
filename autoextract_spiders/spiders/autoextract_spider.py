@@ -1,3 +1,4 @@
+import re
 import logging
 
 from scrapy import signals
@@ -193,11 +194,31 @@ class AutoExtractSpider(Spider):
             item = autoextract.get(page_type, {})
             if not item:
                 continue
+            # Filter based on probability
             if self.threshold > 0 and item.get('probability', 0) < self.threshold:
                 self.logger.debug('Dropping %s URL: %s, low probability=%f', page_type,
                                   response.url, item['probability'])
                 self.crawler.stats.inc_value('error/probability')
                 continue
+            # Filter based on date (anything that matches)
+            if page_type == 'article' and getattr(self, 'date_rules', False) \
+                    and isinstance(self.date_rules, list):
+                if not item.get('datePublished'):
+                    self.logger.debug('Dropping %s URL: %s, datePublished not found',
+                                       page_type, response.url)
+                    self.crawler.stats.inc_value('error/date_published')
+                    continue
+                rules_ok = False
+                for rule in self.date_rules:
+                    if re.match(rule, item['datePublished']):
+                        rules_ok = True
+                        break
+                if not rules_ok:
+                    self.logger.debug('Dropping %s URL: %s, datePublished not matched',
+                                       page_type, response.url)
+                    self.crawler.stats.inc_value('error/date_published')
+                    continue
+
             # Remove empty values from the item to enable ScrapyCloud stats
             item = {k: v for k, v in item.items() if v}
             # Add source URL

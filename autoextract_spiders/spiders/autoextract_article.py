@@ -1,6 +1,8 @@
+import yaml
 import feedparser
 from w3lib.html import strip_html5_whitespace
 from scrapy.http import Request, HtmlResponse, XmlResponse
+from scrapy.utils.misc import arg_to_iter
 
 from ..middlewares import reset_scheduler_on_disabled_frontera
 from ..sessions import crawlera_session
@@ -31,6 +33,19 @@ class ArticleAutoExtract(CrawlerSpider):
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
         spider = super().from_crawler(crawler, *args, **kwargs)
+
+        # JSON date rules, anything that matches
+        if getattr(spider, 'dates', False):
+            rules = spider.dates
+            try:
+                spider.date_rules = yaml.load(rules) if not isinstance(rules, list) else rules
+                spider.date_rules = [str(d) for d in arg_to_iter(spider.date_rules)]
+                spider.logger.debug('Using date rules: %s', spider.date_rules)
+            except Exception as err:
+                raise ValueError('Invalid date rules: %s %s', rules, err)
+        else:
+            spider.date_rules = []
+
         spider.main_callback = spider.parse_source
         spider.main_errback = spider.errback_source
         # A switch to enable revisiting article pages.
