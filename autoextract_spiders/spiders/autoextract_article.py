@@ -2,6 +2,7 @@ import feedparser
 from w3lib.html import strip_html5_whitespace
 from scrapy.http import Request, HtmlResponse, XmlResponse
 
+from ..middlewares import reset_scheduler_on_disabled_frontera
 from ..sessions import crawlera_session
 from .util import is_valid_url
 from .crawler_spider import CrawlerSpider
@@ -21,6 +22,11 @@ class ArticleAutoExtract(CrawlerSpider):
         'HCF_CONSUMER_SLOT': 'articles0',
         'HCF_CONSUMER_MAX_REQUESTS': 100,
     }
+
+    @classmethod
+    def update_settings(cls, settings):
+        super().update_settings(settings)
+        reset_scheduler_on_disabled_frontera(settings)
 
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
