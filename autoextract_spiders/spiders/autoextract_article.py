@@ -2,6 +2,7 @@ import feedparser
 from w3lib.html import strip_html5_whitespace
 from scrapy.http import Request, HtmlResponse, XmlResponse
 
+from ..sessions import crawlera_session
 from .util import is_valid_url
 from .crawler_spider import CrawlerSpider
 
@@ -17,6 +18,7 @@ class ArticleAutoExtract(CrawlerSpider):
         spider.main_errback = spider.errback_source
         return spider
 
+    @crawlera_session.follow_session
     def parse_source(self, response: HtmlResponse):
         """
         Parse a seed URL.
@@ -71,6 +73,7 @@ class ArticleAutoExtract(CrawlerSpider):
 
         return feed_urls
 
+    @crawlera_session.follow_session
     def parse_feed(self, response: XmlResponse):
         """
         Parse a feed XML.

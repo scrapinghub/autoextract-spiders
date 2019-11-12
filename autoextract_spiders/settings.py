@@ -42,9 +42,13 @@ SPIDER_MIDDLEWARES = {
 # Enable or disable downloader middlewares
 # See http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
+    'scrapy_crawlera.CrawleraMiddleware': 300,
     'scrapy_count_filter.middleware.GlobalCountFilterMiddleware': 541,
     'scrapy_count_filter.middleware.HostsCountFilterMiddleware': 542,
     'scrapy_autoextract.middlewares.AutoExtractMiddleware': 543,
 }
 
 AUTOEXTRACT_USER = '[API key]'
+
+CRAWLERA_ENABLED = False
+CRAWLERA_APIKEY = '[API key]'
