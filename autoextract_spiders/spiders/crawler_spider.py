@@ -8,7 +8,7 @@ from scrapy.linkextractors import LinkExtractor
 from scrapy.exceptions import IgnoreRequest, DropItem
 from scrapy.utils.misc import arg_to_iter
 
-from ..sessions import RequestSession, update_redirect_middleware
+from ..sessions import crawlera_session, update_redirect_middleware
 from .rule import Rule
 from .autoextract_spider import AutoExtractSpider
 from .util import is_valid_url, utc_iso_date, is_autoextract_request
@@ -18,8 +18,6 @@ META_TO_KEEP = ('source_url',)
 DEFAULT_ALLOWED_DOMAINS = ['xod.scrapinghub.com', 'autoextract.scrapinghub.com']
 
 DEFAULT_COUNT_LIMITS = {'page_count': 1000, 'item_count': 100}
-
-CRAWLERA_SESSION = RequestSession(x_crawlera_profile='desktop')
 
 
 class CrawlerSpider(AutoExtractSpider):
@@ -171,7 +169,7 @@ class CrawlerSpider(AutoExtractSpider):
 
         return self
 
-    @CRAWLERA_SESSION.init_start_requests
+    @crawlera_session.init_start_requests
     def start_requests(self):
         """
         The main function.
@@ -233,7 +231,7 @@ class CrawlerSpider(AutoExtractSpider):
         # so there are no links and nothing to follow
         if response.body:
             for request in self._requests_to_follow(response):
-                yield CRAWLERA_SESSION.init_request(request)
+                yield crawlera_session.init_request(request)
         elif is_autoextract_request(response):
             # Make another request to fetch the full page HTML
             # Risk of being banned
@@ -243,7 +241,7 @@ class CrawlerSpider(AutoExtractSpider):
                           callback=self.main_callback,
                           errback=self.main_errback,
                           dont_filter=True)
-            yield CRAWLERA_SESSION.init_request(request)
+            yield crawlera_session.init_request(request)
 
     def _rule_process_links(self, links):
         """

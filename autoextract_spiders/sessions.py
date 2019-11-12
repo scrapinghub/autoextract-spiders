@@ -27,3 +27,6 @@ class RequestSession(_Session):
             yield from (orig_wrapper if is_crawlera_enabled else wrapped)(spider, response)
         _wrapper.__name__ = wrapped.__name__
         return _wrapper
+
+
+crawlera_session = RequestSession(x_crawlera_profile='desktop')
