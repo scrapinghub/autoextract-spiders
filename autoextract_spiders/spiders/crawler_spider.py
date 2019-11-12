@@ -8,6 +8,7 @@ from scrapy.linkextractors import LinkExtractor
 from scrapy.exceptions import IgnoreRequest, DropItem
 from scrapy.utils.misc import arg_to_iter
 
+from ..sessions import RequestSession, update_redirect_middleware
 from .rule import Rule
 from .autoextract_spider import AutoExtractSpider
 from .util import is_valid_url, utc_iso_date, is_autoextract_request
@@ -17,6 +18,8 @@ META_TO_KEEP = ('source_url',)
 DEFAULT_ALLOWED_DOMAINS = ['xod.scrapinghub.com', 'autoextract.scrapinghub.com']
 
 DEFAULT_COUNT_LIMITS = {'page_count': 1000, 'item_count': 100}
+
+CRAWLERA_SESSION = RequestSession(x_crawlera_profile='desktop')
 
 
 class CrawlerSpider(AutoExtractSpider):
@@ -63,6 +66,11 @@ class CrawlerSpider(AutoExtractSpider):
              process_req_resp='_rule_process_req_resp',
              follow=True),
     ]
+
+    @classmethod
+    def update_settings(cls, settings):
+        super().update_settings(settings)
+        update_redirect_middleware(settings)
 
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
@@ -163,6 +171,7 @@ class CrawlerSpider(AutoExtractSpider):
 
         return self
 
+    @CRAWLERA_SESSION.init_start_requests
     def start_requests(self):
         """
         The main function.
@@ -223,16 +232,18 @@ class CrawlerSpider(AutoExtractSpider):
         # Currently AutoExtract responses don't contain the full page HTML,
         # so there are no links and nothing to follow
         if response.body:
-            yield from self._requests_to_follow(response)
+            for request in self._requests_to_follow(response):
+                yield CRAWLERA_SESSION.init_request(request)
         elif is_autoextract_request(response):
             # Make another request to fetch the full page HTML
             # Risk of being banned
             self.crawler.stats.inc_value('x_request/discovery')
-            yield Request(response_url,
+            request = Request(response_url,
                           meta={'source_url': response.meta['source_url']},
                           callback=self.main_callback,
                           errback=self.main_errback,
                           dont_filter=True)
+            yield CRAWLERA_SESSION.init_request(request)
 
     def _rule_process_links(self, links):
         """

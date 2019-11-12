@@ -16,7 +16,11 @@ SUPPORTED_TYPES = ('article', 'product')
 class AutoExtractRequest(Request):
 
     def __init__(self, url, **kwargs):
-        meta = kwargs.pop('meta', {})
+        meta = kwargs.pop('meta', None) or {}
+        meta.update(  # disable crawlera for all AE requests
+            dont_proxy=True,
+            no_crawlera_session=True,
+        )
         page_type = kwargs.pop('page_type', None)
         feed_url = kwargs.pop('feed_url', None)
         if feed_url:
