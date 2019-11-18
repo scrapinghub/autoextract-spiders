@@ -10,7 +10,7 @@ scrapy_crawlera~=1.6.0
 crawlera-session==1.0.1
 # frontera support
 scrapy-frontera~=0.2.0
-hcf-backend~=0.2.5
+hcf-backend~=0.4.3
 
 git+https://github.com/croqaz/scrapy-link-filter
 git+https://github.com/croqaz/scrapy-count-filter
