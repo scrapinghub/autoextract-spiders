@@ -58,6 +58,17 @@ The next two options will switch to **discovery-only mode**, or will switch to *
 There are a few options that can be tweaked either in command line, or ScrapyCloud settings, that will change the behaviour of the spiders.
 Be careful when changing the ScrapyCloud settings, because they will affect all the future jobs.
 
+#### Crawlera
+
+It's possible to use [Crawlera](https://scrapinghub.com/crawlera) to avoid bans during discovery process and significantly improve quality of your crawl in some cases.
+
+* **CRAWLERA_ENABLED** (default ``False``): enable using Crawlera for discovery
+* **CRAWLERA_APIKEY** (no default value): provide your Crawlera API key to use it
+
+**Note**: Crawlera won't be used for your requests to AutoExtract API.
+
+#### Other options
+
 * **DEPTH_LIMIT** (default 2): the maximum depth that will be allowed to crawl for a site.
 * **CLOSESPIDER_TIMEOUT** (no default value): if the spider is running for more than that number of seconds, it will be automatically closed.
 
