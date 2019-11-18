@@ -73,11 +73,34 @@ It's possible to use [Crawlera](https://scrapinghub.com/crawlera) to avoid bans 
 
 However you could always tune it according to your needs. If that's the case, it might be useful to get familiar with [shub-workflow](https://github.com/scrapinghub/shub-workflow/wiki/Basic-Tutorial) describing the topic and related settings in more detail.
 
+##### Scaling
+
 Shortly, you could scale a crawler by running multiple producers and consumers in parallel. An amount of slots in a single frontier defines how many consumer jobs you may have (note that each consumer reads only from a single slot). On the other hand, each producer writes data to all slots, so there's no limit on the amount of producer jobs.
 
 HCF backend logic can be modified by providing an additional spider argument ``frontera_settings_json`` with a settings dictionary in JSON format. For example, to launch your spider in producer-only mode, you should provide ``frontera_settings_json={"HCF_CONSUMER_FRONTIER":null}``(similarly, reset a setting ``HCF_PRODUCER_FRONTIER`` for consumer-only mode). Additional settings for the backend can be found [here](https://github.com/scrapinghub/hcf-backend/blob/0.4.3/hcf_backend/backend.py#L45) and get overwritten in the same way.
 
-URL deduplication provided by Frontera works in the following way: a frontera slot stores information about links even after consuming/deleting the links from the slot queue, so when you'll try to add the same link to the slot, it will be ignored. Sometimes the behaviour is not what's needed (like, when you want to recrawl with different parameters). The simplest solution in this case would be to drop a slot (or a whole frontier), using ``hcfpal.py`` script and recrawl from scratch. To delete a slot, launch the script from Dash UI providing a frontier name (default is ``autoextract``) and the slot prefix (default is ``articles``) or the full slot name via script arguments, like ``delete autoextract articles0``. The [hcfpal.py](https://github.com/scrapinghub/hcf-backend/blob/0.4.3/hcf_backend/utils/hcfpal.py) can be also used from your local machine after installing ``hcf-backend`` package, check its built-in command-line helper.
+##### Manager
+
+To facilitate periodic scheduling of consumers there's one useful tool provided by ``hcf-backend`` package called ``hcfmanager.py``, which the project installs as ``manager.py``. This script allows easy handling of consumers, by scheduling a consumer job for each free slot with at least one pending request. Basic command line:
+
+```sh
+> manager.py <spider name> <frontier name> <slots prefix> --loop-mode=<seconds> [--project-id=<project_id>] [--max-running-jobs=<max parallel jobs>] [--spider-args=<json dict>] [--job-settings=<json dict>]
+```
+
+An example for this project:
+
+```sh
+> manager.py articles autoextract articles --loop-mode=120
+```
+
+It also supports a loop mode, under which it will continue monitoring the slots and schedule jobs for them, and will not finish until there is no more pending requests available on slots. If the script runs on ScrapyCloud, no need to pass ``--project-id``, as it is automatically detected.
+
+##### URL deduplication
+
+URL deduplication provided by Frontera works in the following way: a frontera slot stores information about links even after consuming/deleting the links from the slot queue, so when you'll try to add the same link to the slot, it will be ignored. Sometimes the behaviour is not what's needed (like, when you want to recrawl with different parameters). The simplest solution in this case would be to drop a slot (or a whole frontier), using ``hcfpal.py`` script and recrawl from scratch. To delete a slot, launch the script from Dash UI providing a frontier name (default is ``autoextract``) and the slot prefix (default is ``articles``) or the full slot name via script arguments, like ``delete autoextract articles0``.
+
+The [hcfpal.py](https://github.com/scrapinghub/hcf-backend/blob/0.4.3/hcf_backend/utils/hcfpal.py) has options for counting, listing, deleting, moving and dumping slots content and can be also used from your local machine after installing ``hcf-backend`` package, check its built-in command-line helper.
+
 
 **Note** Frontera integration can be disabled via **FRONTERA_DISABLED** setting.
 
