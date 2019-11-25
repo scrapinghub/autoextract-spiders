@@ -153,7 +153,8 @@ class AutoExtractSpider(Spider):
         if is_blacklisted_url(url):
             self.crawler.stats.inc_value('error/blacklisted_url')
             return
-
+        meta = meta or {}
+        meta['cf_store'] = True
         req = AutoExtractRequest(url,
                                  meta=meta,
                                  page_type=self.page_type,
