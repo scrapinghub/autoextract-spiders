@@ -1,4 +1,4 @@
 version: GIT
-stack: scrapy:1.7-py38
+stack: scrapy:1.8-py3
 requirements:
   file: requirements.txt
