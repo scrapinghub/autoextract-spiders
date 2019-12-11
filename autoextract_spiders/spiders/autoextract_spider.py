@@ -14,7 +14,7 @@ DEFAULT_THRESHOLD = .1
 
 SUPPORTED_TYPES = ('article', 'product')
 
-USER_AGENT = 'AutoExtract Spider v{}'.format(__version__)
+USER_AGENT = 'autoextract-spiders/{}'.format(__version__)
 if hasattr(scrapy_autoextract.middlewares, 'USER_AGENT'):
     USER_AGENT += ' ' + scrapy_autoextract.middlewares.USER_AGENT
 
