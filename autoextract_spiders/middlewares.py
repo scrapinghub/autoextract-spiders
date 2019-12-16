@@ -11,12 +11,14 @@ def reset_scheduler_on_disabled_frontera(settings):
 
 
 class FronteraDisabledMixin:
+
     @property
     def is_frontera_enabled(self):
         return not self.crawler.settings.getbool('FRONTERA_DISABLED')
 
 
 class SchedulerSpiderMiddleware(_SSpiderMiddleware, FronteraDisabledMixin):
+
     def process_spider_output(self, response, result, spider):
         if self.is_frontera_enabled:
             return self.scheduler.process_spider_output(response, result, spider)
@@ -29,7 +31,9 @@ class SchedulerSpiderMiddleware(_SSpiderMiddleware, FronteraDisabledMixin):
             return []
         return start_requests
 
+
 class SchedulerDownloaderMiddleware(_SDownloaderMiddleware, FronteraDisabledMixin):
+
     def process_exception(self, request, exception, spider):
         if self.is_frontera_enabled:
             return self.scheduler.process_exception(request, exception, spider)

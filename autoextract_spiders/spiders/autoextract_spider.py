@@ -4,13 +4,19 @@ from scrapy import signals
 from scrapy.spiders import Spider
 from scrapy.http import Request
 from scrapy.exceptions import IgnoreRequest, DropItem
+import scrapy_autoextract.middlewares
 
+from ..__version__ import __version__
 from .util import load_sources, is_valid_url, is_blacklisted_url
 from .util import utc_iso_date, maybe_is_article, maybe_is_product
 
 DEFAULT_THRESHOLD = .1
 
 SUPPORTED_TYPES = ('article', 'product')
+
+USER_AGENT = 'autoextract-spiders/{}'.format(__version__)
+if hasattr(scrapy_autoextract.middlewares, 'USER_AGENT'):
+    USER_AGENT += ' ' + scrapy_autoextract.middlewares.USER_AGENT
 
 
 class AutoExtractRequest(Request):
@@ -33,6 +39,7 @@ class AutoExtractRequest(Request):
         super().__init__(url, meta=meta, **kwargs)
         if without_autoextract is not True:
             self.meta['autoextract'] = {'enabled': True}
+            self.meta['autoextract']['headers'] = {'User-Agent': USER_AGENT}
             if page_type:
                 self.meta['autoextract']['pageType'] = page_type
 
