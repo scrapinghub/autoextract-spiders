@@ -12,7 +12,7 @@ from .util import utc_iso_date, maybe_is_article, maybe_is_product
 
 DEFAULT_THRESHOLD = .1
 
-SUPPORTED_TYPES = ('article', 'product')
+SUPPORTED_TYPES = ('article', 'product', 'jobPosting')
 
 USER_AGENT = 'autoextract-spiders/{}'.format(__version__)
 if hasattr(scrapy_autoextract.middlewares, 'USER_AGENT'):
@@ -169,11 +169,11 @@ class AutoExtractSpider(Spider):
                                  errback=self.errback_item,
                                  dont_filter=True)
 
-        if check_page_type and self.page_type == 'article':
+        if check_page_type and self.page_type in ('article', 'jobPosting'):
             if maybe_is_article(url):
                 return req
-            self.logger.debug('Dropping URL: %s because is not an article', url)
-            self.crawler.stats.inc_value('error/probably_not_article')
+            self.logger.debug('Dropping URL: %s because is not %s', url, self.page_type)
+            self.crawler.stats.inc_value('error/probably_not_{}'.format(self.page_type))
             return
 
         elif check_page_type and self.page_type == 'product':
