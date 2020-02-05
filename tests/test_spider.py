@@ -6,9 +6,12 @@ from scrapy.utils.project import get_project_settings
 
 sys.path.insert(1, os.getcwd())
 from autoextract_spiders.spiders import CrawlerSpider  # noqa: E402
-from autoextract_spiders.spiders import ArticleAutoExtract, ProductAutoExtract  # noqa: E402
+from autoextract_spiders.spiders import ArticleAutoExtract, ProductAutoExtract, JobsAutoExtract  # noqa: E40
 
 CrawlerSpider.name = 'crawler'
+
+settings = get_project_settings()
+settings.setdict({'HCF_PROJECT_ID': 123}, priority='project')
 
 
 def test_simple_params():
@@ -16,7 +19,7 @@ def test_simple_params():
     p = 'article'
     e = {'allow': 'example.com'}
     c = {'item_count': 9}
-    proc = CrawlerProcess(get_project_settings())
+    proc = CrawlerProcess(settings)
     proc.crawl(CrawlerSpider, threshold=t, page_type=p, extract_rules=str(e), count_limits=str(c))
     crawler = proc._crawlers.pop()
     proc.stop()
@@ -33,7 +36,7 @@ def test_more_params():
     mp = 99
     al = "example.com"
     il = "'fb.com'"
-    proc = CrawlerProcess(get_project_settings())
+    proc = CrawlerProcess(settings)
     proc.crawl(CrawlerSpider, page_type=p, max_pages=mp, max_items=mi, allow_links=al, ignore_links=il)
     crawler = proc._crawlers.pop()
     proc.stop()
@@ -46,7 +49,7 @@ def test_more_params():
 
 
 def test_max_items_max_pages():
-    proc = CrawlerProcess(get_project_settings())
+    proc = CrawlerProcess()
     proc.crawl(CrawlerSpider, page_type='article', max_items='3', max_pages='9', same_domain='no')
     crawler = proc._crawlers.pop()
     proc.stop()
@@ -63,7 +66,7 @@ def test_max_items_max_pages():
 
 
 def test_allow_ignore_links():
-    proc = CrawlerProcess(get_project_settings())
+    proc = CrawlerProcess()
     proc.crawl(CrawlerSpider, page_type='product', allow_links='/stuff', ignore_links='/whatever')
     crawler = proc._crawlers.pop()
     proc.stop()
@@ -76,7 +79,7 @@ def test_allow_ignore_links():
 
 
 def test_simple_article():
-    proc = CrawlerProcess(get_project_settings())
+    proc = CrawlerProcess()
     proc.crawl(ArticleAutoExtract)
     crawler = proc._crawlers.pop()
     proc.stop()
@@ -89,7 +92,7 @@ def test_simple_article():
 
 
 def test_simple_product():
-    proc = CrawlerProcess(get_project_settings())
+    proc = CrawlerProcess()
     proc.crawl(ProductAutoExtract)
     crawler = proc._crawlers.pop()
     proc.stop()
@@ -99,3 +102,13 @@ def test_simple_product():
     assert crawler.spider.same_origin is True
     assert isinstance(crawler.spider.threshold, float)
     assert isinstance(crawler.spider.only_discovery, bool)
+
+
+def test_simple_job_posting():
+    proc = CrawlerProcess()
+    proc.crawl(JobsAutoExtract)
+    crawler = proc._crawlers.pop()
+    proc.stop()
+
+    assert crawler.spider.name == 'jobs'
+    assert crawler.spider.page_type == 'jobPosting'
