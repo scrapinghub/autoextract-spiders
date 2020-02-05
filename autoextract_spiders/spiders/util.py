@@ -53,7 +53,7 @@ def is_index_url(url: str) -> bool:
 
 def could_be_content_page(url: str) -> bool:
     """
-    Try to guess if the link is a content page (an about, contact-us, etc)
+    Try to guess if the link is a content page.
     It's not a perfect check, but it can identify URLs that are obviously not content.
     """
     url = url.lower().rstrip('/')
@@ -90,7 +90,7 @@ def maybe_is_product(url: str) -> bool:
 
 def maybe_is_article(url: str) -> bool:
     """
-    Try to guess if the link is an article page (an about, contact-us, etc)
+    Try to guess if the link is an article page.
     """
     if not could_be_content_page(url):
         return False
