@@ -8,7 +8,7 @@ import scrapy_autoextract.middlewares
 
 from ..__version__ import __version__
 from .util import load_sources, is_valid_url, is_blacklisted_url
-from .util import utc_iso_date, maybe_is_article, maybe_is_product
+from .util import utc_iso_date, maybe_is_article, maybe_is_product, maybe_is_job_posting
 
 DEFAULT_THRESHOLD = .1
 
@@ -169,19 +169,13 @@ class AutoExtractSpider(Spider):
                                  errback=self.errback_item,
                                  dont_filter=True)
 
-        if check_page_type and self.page_type in ('article', 'jobPosting'):
-            if maybe_is_article(url):
-                return req
-            self.logger.debug('Dropping URL: %s because is not %s', url, self.page_type)
-            self.crawler.stats.inc_value('error/probably_not_{}'.format(self.page_type))
-            return
-
-        elif check_page_type and self.page_type == 'product':
-            if maybe_is_product(url):
-                return req
-            self.logger.debug('Dropping URL: %s because is not a product', url)
-            self.crawler.stats.inc_value('error/probably_not_product')
-            return
+        if check_page_type:
+            if (self.page_type == 'article' and not maybe_is_article(url)) or \
+                    (self.page_type == 'product' and not maybe_is_product(url)) or \
+                    (self.page_type == 'jobPosting' and not maybe_is_job_posting(url)):
+                self.logger.debug('Dropping URL: %s because is not %s', url, self.page_type)
+                self.crawler.stats.inc_value('error/probably_not_{}'.format(self.page_type))
+                return
 
         return req
 

@@ -57,14 +57,12 @@ def could_be_content_page(url: str) -> bool:
     It's not a perfect check, but it can identify URLs that are obviously not content.
     """
     url = url.lower().rstrip('/')
-    if re.search('/about-?(us)?$', url) or re.search('/contact-?(us)?$', url):
-        return False
     if url.endswith('/signin') or url.endswith('/login') or \
             url.endswith('/login-page') or url.endswith('/logout'):
         return False
     if url.endswith('/my-account') or url.endswith('/my-wishlist'):
         return False
-    if re.search('/lost[_-]password$', url) or re.search('/forgot[_-]password$', url):
+    if re.search('/(lost|forgot)[_-]password$', url):
         return False
     if url.endswith('/search') or url.endswith('/archive'):
         return False
@@ -83,6 +81,8 @@ def maybe_is_product(url: str) -> bool:
     """
     if not could_be_content_page(url):
         return False
+    if re.search('/about-?(us)?$', url) or re.search('/contact-?(us)?$', url):
+        return False
     if url.endswith('/rss') or url.endswith('/feed'):
         return False
     return True
@@ -94,6 +94,8 @@ def maybe_is_article(url: str) -> bool:
     """
     if not could_be_content_page(url):
         return False
+    if re.search('/contact-?(us)?$', url):
+        return False
     if url.endswith('/shipping') or url.endswith('/returns'):
         return False
     if url.endswith('/pricing') or url.endswith('/best-deals'):
@@ -101,6 +103,23 @@ def maybe_is_article(url: str) -> bool:
     if url.endswith('/cart') or url.endswith('/shop') or url.endswith('/checkout'):
         return False
     # Yei, it might be an article
+    return True
+
+
+def maybe_is_job_posting(url: str) -> bool:
+    """
+    Try to guess if the link is a job posting page.
+    """
+    if not could_be_content_page(url):
+        return False
+    if url.endswith('/rss') or url.endswith('/feed'):
+        return False
+    if url.endswith('/shipping') or url.endswith('/returns'):
+        return False
+    if url.endswith('/pricing') or url.endswith('/best-deals'):
+        return False
+    if url.endswith('/cart') or url.endswith('/shop') or url.endswith('/checkout'):
+        return False
     return True
 
 
