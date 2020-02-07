@@ -26,7 +26,7 @@ DEPTH_LIMIT = 2
 DEPTH_STATS_VERBOSE = True
 
 # Disable AutoThrottle middleware
-AUTHTHROTTLE_ENABLED = False
+AUTOTHROTTLE_ENABLED = False
 
 # Setup Retry middleware
 RETRY_TIMES = 2

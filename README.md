@@ -32,6 +32,7 @@ The spiders have exactly the same options, the only difference between them is t
   Example 2: articles from https://www.nytimes.com/, all the article links contain "/yyyy/mm/dd/" so the [regex](https://docs.python.org/3/library/re.html#regular-expression-syntax) for that is "/[0-9]{4}/[0-9]{2}/[0-9]{2}/".
 * **ignore-links** (optional - no default value): what URL patterns NOT to follow. This is the opposite of "allow-links" and is useful when the majority of the links have items, but you want to ignore just a few specific URLs that slow down the discovery.
 * **same-domain** (optional - default True): by default the spider will limit the discovery of links to the same domains as the seeds (eg: if the seed is "dailymail.co.uk", the spider will never extract the links pointing to "facebook.com"). Set to False if you need to disable this, but also check the "extract-rules" advanced option.
+* **dates** (optional - no default value): drop all items that don't match the date patterns specified. The matching is done against "datePublished" date ISO string and only in case of Articles. If the "datePublished" doesn't exist, the item is also dropped.
 
 The options that accept multiple items (seeds, allow-links, deny-links) are strings, or lists in YAML, or JSON format. Example list as YAML: `[item1, item2, item3]`. Example list as JSON: `["item1", "item2", "item3"]`.
 
