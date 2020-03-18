@@ -1,6 +1,6 @@
 import feedparser
 from w3lib.html import strip_html5_whitespace
-from scrapy.http import Request, HtmlResponse, XmlResponse
+from scrapy.http import Request, TextResponse, HtmlResponse
 
 from ..middlewares import reset_scheduler_on_disabled_frontera
 from ..sessions import crawlera_session
@@ -89,7 +89,7 @@ class ArticleAutoExtract(CrawlerSpider):
                     feed_urls.add(feed_url)
 
         if not feed_urls:
-            for link in response.xpath('//a/@href').get():
+            for link in response.xpath('//a/@href').getall():
                 link_href = strip_html5_whitespace(link)
                 if link_href.endswith('rss.xml'):
                     feed_url = response.urljoin(link_href)
@@ -98,11 +98,11 @@ class ArticleAutoExtract(CrawlerSpider):
         return feed_urls
 
     @crawlera_session.follow_session
-    def parse_feed(self, response: XmlResponse):
+    def parse_feed(self, response: TextResponse):
         """
         Parse a feed XML.
         """
-        if not isinstance(response, XmlResponse):
+        if not isinstance(response, TextResponse):
             self.logger.warning('Invalid Feed response: %s', response)
             self.crawler.stats.inc_value('error/invalid_feed_response')
             return

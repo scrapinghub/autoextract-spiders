@@ -1,6 +1,5 @@
 import yaml
 from urllib.parse import urlsplit
-from w3lib.html import strip_html5_whitespace
 
 from scrapy import signals
 from scrapy.http import Request, TextResponse
@@ -210,15 +209,13 @@ class CrawlerSpider(AutoExtractSpider):
         if not isinstance(response, TextResponse):
             return
 
-        response_url = strip_html5_whitespace(response.url)
-
         # Try to parse the AutoExtract response (if available) and return the correct Item
         if not self.only_discovery:
             if is_autoextract_request(response):
                 yield from self.parse_item(response)
         else:
             # For discovery-only mode, return only the URLs
-            item = {'url': response_url}
+            item = {'url': response.url}
             item['scraped_at'] = utc_iso_date()
             if response.meta.get('source_url'):
                 item['source_url'] = response.meta['source_url']
@@ -236,7 +233,7 @@ class CrawlerSpider(AutoExtractSpider):
             # Make another request to fetch the full page HTML
             # Risk of being banned
             self.crawler.stats.inc_value('x_request/discovery')
-            request = Request(response_url,
+            request = Request(response.url,
                           meta={'source_url': response.meta['source_url']},
                           callback=self.main_callback,
                           errback=self.main_errback,
