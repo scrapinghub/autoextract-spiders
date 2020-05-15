@@ -184,12 +184,33 @@ class CrawlerSpider(AutoExtractSpider):
         Because the list is expected to be small, the input can be one, or more URLs.
         Seed URLs will be crawled deeply, trying to find articles, or products.
         """
+        if self.seeds_file_url:
+            yield Request(self.seeds_file_url,
+                          meta={'source_url': self.seeds_file_url},
+                          callback=self.parse_seeds_file,
+                          errback=self.main_errback,
+                          dont_filter=True)
+
         if not self.seed_urls:
             return
 
         self.logger.info('Using seeds: %s', self.seed_urls)
+        yield from self._schedule_seed_urls(self.seed_urls)
 
-        for url in self.seed_urls:
+    def parse_seeds_file(self, response):
+        """
+        Process seeds file url response and schedule seed urls for processing.
+        """
+        if not isinstance(response, TextResponse):
+            return
+        seeds = response.text.split()
+        yield from self._schedule_seed_urls(seeds)
+
+    def _schedule_seed_urls(self, seed_urls):
+        """
+        A helper to process seed urls and yield appropriate requests.
+        """
+        for url in seed_urls:
             url = url.strip()
             if not is_valid_url(url):
                 self.logger.warning('Ignoring invalid seed URL: %s', url)
