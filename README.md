@@ -23,7 +23,7 @@ The spiders can be started from command line, or deployed in a [ScrapyCloud](htt
 The spiders have exactly the same options, the only difference between them is they are specialized for extracting either articles, or products.
 
 * **seeds** (required): one, or more seed URLs (eg: https://www.example.com/home/)
-* **seeds_file_url** (optional - no default value): a URL to a plain text file with a list of seed URLs, each on a separate line.
+* **seeds-file-url** (optional - no default value): a URL to a plain text file with a list of seed URLs, each on a separate line.
 * **threshold** (optional, default 0.1): drop all items below the threshold, which represents the confidence that the URL is the page-type you specified (article, or product), as recognised by the extraction engine. The probability is returned for all the items and is between 0.0 and 1.0, where 0 means "the URL is definitely not that page-type" and 1 means "the URL is that page-type for sure" and in this case the quality of the extraction will be very good.
 * **max-items** (optional - default 100): how many items (articles, or products) should the spider extract. It's important to specify this if you need a small sample and a fast extraction. When the items are extracted, the spider stops. The default limit SHOULD be changed if you specify multiple seeds, because the default limit is global, not per seed.
 * **max-pages** (optional - default 1000): how many pages should the spider follow, when discovering links. It's important to limit the number of pages, otherwise the spider can run for days, looking for data.
