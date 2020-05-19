@@ -56,6 +56,7 @@ class CrawlerSpider(AutoExtractSpider):
     only_discovery = False
     same_origin = True
     seed_urls = None
+    seeds_file_url = None
     count_limits = DEFAULT_COUNT_LIMITS
     rules = [
         Rule(LinkExtractor(),
@@ -98,6 +99,9 @@ class CrawlerSpider(AutoExtractSpider):
             del spider.seeds
         if spider.seed_urls:
             spider.seed_urls = arg_to_iter(spider.seed_urls)
+        # Seeds file URL
+        if spider.get_arg('seeds-file-url'):
+            spider.seeds_file_url = spider.get_arg('seeds-file-url')
 
         # Domains allowed to be crawled, for OffsiteMiddleware and others
         if spider.same_origin and spider.seed_urls:
