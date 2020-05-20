@@ -33,6 +33,7 @@ class CrawlerSpider(AutoExtractSpider):
     The mandatory "page-type" param from the parent AutoExtract Spider is also required.
 
     Optional params:
+    * seeds-file-url: an optional URL to a plain text file with a list of seed URLs;
     * max-items: how many items (articles, or products) should the spider extract, per host;
         When the items are extracted, the spider stops. default: 100;
     * max-pages: how many pages should the spider follow per host, when discovering links;
