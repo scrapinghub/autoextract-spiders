@@ -236,8 +236,9 @@ class CrawlerSpider(AutoExtractSpider):
             return
 
         # Try to parse the AutoExtract response (if available) and return the correct Item
+        is_autoextract_response = is_autoextract_request(response)
         if not self.only_discovery:
-            if is_autoextract_request(response):
+            if is_autoextract_response:
                 yield from self.parse_item(response)
         else:
             # For discovery-only mode, return only the URLs
@@ -252,10 +253,10 @@ class CrawlerSpider(AutoExtractSpider):
         # Cycle and follow links
         # Currently AutoExtract responses don't contain the full page HTML,
         # so there are no links and nothing to follow
-        if response.body:
+        if response.body and not is_autoextract_response:
             for request in self._requests_to_follow(response):
                 yield crawlera_session.init_request(request)
-        elif is_autoextract_request(response):
+        elif is_autoextract_response:
             # Make another request to fetch the full page HTML
             # Risk of being banned
             self.crawler.stats.inc_value('x_request/discovery')
