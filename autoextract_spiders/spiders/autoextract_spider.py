@@ -7,7 +7,8 @@ from scrapy.exceptions import IgnoreRequest, DropItem
 import scrapy_autoextract.middlewares
 
 from ..__version__ import __version__
-from .util import load_sources, is_valid_url, is_blacklisted_url
+from .util import load_sources, is_valid_url, is_blacklisted_url, \
+    FingerprintPrefix
 from .util import utc_iso_date, maybe_is_article, maybe_is_product, maybe_is_job_posting
 
 DEFAULT_THRESHOLD = .1
@@ -162,12 +163,12 @@ class AutoExtractSpider(Spider):
             return
         meta = meta or {}
         meta['cf_store'] = True
+        meta['fingerprint_prefix'] = FingerprintPrefix.AUTOEXTRACT.value
         req = AutoExtractRequest(url,
                                  meta=meta,
                                  page_type=self.page_type,
                                  callback=self.parse_item,
-                                 errback=self.errback_item,
-                                 dont_filter=True)
+                                 errback=self.errback_item)
 
         if check_page_type:
             if (self.page_type == 'article' and not maybe_is_article(url)) or \

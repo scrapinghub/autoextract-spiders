@@ -10,7 +10,8 @@ from scrapy.utils.misc import arg_to_iter
 from ..sessions import crawlera_session, update_redirect_middleware
 from .rule import Rule
 from .autoextract_spider import AutoExtractSpider
-from .util import is_valid_url, utc_iso_date, is_autoextract_request
+from .util import is_valid_url, utc_iso_date, is_autoextract_request, \
+    FingerprintPrefix
 
 META_TO_KEEP = ('source_url',)
 
@@ -260,11 +261,12 @@ class CrawlerSpider(AutoExtractSpider):
             # Make another request to fetch the full page HTML
             # Risk of being banned
             self.crawler.stats.inc_value('x_request/discovery')
+            meta = {'source_url': response.meta['source_url'],
+                    'fingerprint_prefix': FingerprintPrefix.SCRAPY.value}
             request = Request(response.url,
-                          meta={'source_url': response.meta['source_url']},
+                          meta=meta,
                           callback=self.main_callback,
-                          errback=self.main_errback,
-                          dont_filter=True)
+                          errback=self.main_errback)
             yield crawlera_session.init_request(request)
 
     def _rule_process_links(self, links):
