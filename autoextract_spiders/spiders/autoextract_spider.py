@@ -204,6 +204,8 @@ class AutoExtractSpider(Spider):
             # Add source URL
             if response.meta.get('source_url'):
                 item['source_url'] = response.meta['source_url']
+            if response.meta.get("referrer_url"):
+                item['referrer_url'] = response.meta['referrer_url']
             # Add current timestamp
             item['scraped_at'] = utc_iso_date()
             yield item
