@@ -224,7 +224,7 @@ class CrawlerSpider(AutoExtractSpider):
             # Initial request to the seed URL
             self.crawler.stats.inc_value('x_request/seeds')
             yield Request(url,
-                          meta={'source_url': url},
+                          meta={'source_url': url, 'referrer_url': url},
                           callback=self.main_callback,
                           errback=self.main_errback,
                           dont_filter=True)
