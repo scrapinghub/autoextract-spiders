@@ -224,7 +224,7 @@ class CrawlerSpider(AutoExtractSpider):
             # Initial request to the seed URL
             self.crawler.stats.inc_value('x_request/seeds')
             request = Request(url,
-                          meta={'source_url': url, 'referrer_url': url},
+                          meta={'source_url': url},
                           callback=self.main_callback,
                           errback=self.main_errback,
                           dont_filter=True)
@@ -251,8 +251,6 @@ class CrawlerSpider(AutoExtractSpider):
             # For discovery-only mode, return only the URLs
             item = {'url': response.url}
             item['scraped_at'] = utc_iso_date()
-            if response.meta.get("referrer_url"):
-                item['referrer_url'] = response.meta['referrer_url']
             if response.meta.get('source_url'):
                 item['source_url'] = response.meta['source_url']
             if response.meta.get('link_text'):
@@ -270,7 +268,6 @@ class CrawlerSpider(AutoExtractSpider):
             # Risk of being banned
             self.crawler.stats.inc_value('x_request/discovery')
             meta = {'source_url': response.meta['source_url'],
-                    'referrer_url': response.meta.get('referrer_url', 'unknown'),
                     'fingerprint_prefix': FingerprintPrefix.SCRAPY.value}
             request = Request(response.url,
                           meta=meta,
@@ -312,7 +309,7 @@ class CrawlerSpider(AutoExtractSpider):
                 links = rule.process_links(links)
             for link in links:
                 seen.add(link.url)
-                meta = {'rule': n, 'link_text': link.text, 'referrer_url': response.url,}
+                meta = {'rule': n, 'link_text': link.text}
                 request = self.make_extract_request(link.url, meta=meta)
                 if not request:
                     continue
