@@ -223,11 +223,17 @@ class CrawlerSpider(AutoExtractSpider):
                 continue
             # Initial request to the seed URL
             self.crawler.stats.inc_value('x_request/seeds')
-            yield Request(url,
+            request = Request(url,
                           meta={'source_url': url},
                           callback=self.main_callback,
                           errback=self.main_errback,
                           dont_filter=True)
+            # Trick required to avoid some seeds to be never processed or too late.
+            try:
+                self.crawler.engine.crawl(request, self)
+            except AssertionError:
+                yield request
+
 
     def parse_page(self, response):
         """
