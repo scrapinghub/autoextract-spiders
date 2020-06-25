@@ -69,12 +69,12 @@ class CrawlerSpider(AutoExtractSpider):
 
     frontera_settings = {
         'HCF_PRODUCER_FRONTIER': 'autoextract',
-        'HCF_PRODUCER_SLOT_PREFIX': 'items',
+        'HCF_PRODUCER_SLOT_PREFIX': 'queue',
         'HCF_PRODUCER_NUMBER_OF_SLOTS': 1,
         'HCF_PRODUCER_BATCH_SIZE': 100,
 
         'HCF_CONSUMER_FRONTIER': 'autoextract',
-        'HCF_CONSUMER_SLOT': 'items0',
+        'HCF_CONSUMER_SLOT': 'queue0',
         'HCF_CONSUMER_MAX_REQUESTS': 100,
     }
 
