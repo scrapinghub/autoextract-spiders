@@ -114,7 +114,9 @@ class AutoExtractSpider(Spider):
         one_url = getattr(self, 'url', '')
         if one_url:
             self.logger.info('Using one item URL: %s', one_url)
-            autoextract_req = self.make_extract_request(one_url, check_page_type=False)
+            autoextract_req = self.make_extract_request(one_url,
+                                                        meta={'dont_filter': True},
+                                                        check_page_type=False)
             if autoextract_req:
                 yield autoextract_req
             return
@@ -145,7 +147,9 @@ class AutoExtractSpider(Spider):
             except Exception as err:
                 self.logger.warning('Invalid sources file: %s %s', items, err)
             for link in links:
-                autoextract_req = self.make_extract_request(link, check_page_type=False)
+                autoextract_req = self.make_extract_request(link,
+                                                            meta={'dont_filter': True},
+                                                            check_page_type=False)
                 if autoextract_req:
                     yield autoextract_req
 
