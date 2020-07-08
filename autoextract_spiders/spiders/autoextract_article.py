@@ -113,14 +113,11 @@ class ArticleAutoExtract(CrawlerSpider):
 
         for url in seen:
             self.crawler.stats.inc_value('links/rss')
-            # Make a request to fetch the full page HTML
-            # Risk of being banned
-            self.crawler.stats.inc_value('x_request/discovery')
-            yield Request(url,
-                          meta={'source_url': source_url, 'feed_url': feed_url},
-                          callback=self.parse_page,
-                          errback=self.errback_page,
-                          dont_filter=self.dont_filter)
+            yield self.make_extract_request(url,
+                                            meta={'source_url': source_url,
+                                                  'feed_url': feed_url,
+                                                  'dont_filter': self.dont_filter},
+                                            check_page_type=False)
 
     def errback_feed(self, failure):
         """ Feed XML request error """

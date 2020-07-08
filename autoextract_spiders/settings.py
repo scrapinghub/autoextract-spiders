@@ -39,6 +39,14 @@ RETRY_HTTP_CODES = [429]
 SCHEDULER = 'scrapy_frontera.scheduler.FronteraScheduler'
 BACKEND = 'hcf_backend.HCFBackend'
 
+# Better concurrency with multiple domains
+SCHEDULER_PRIORITY_QUEUE = 'scrapy.pqueues.DownloaderAwarePriorityQueue'
+
+# Breadth-first order
+DEPTH_PRIORITY = 1
+SCHEDULER_DISK_QUEUE = 'scrapy.squeues.PickleFifoDiskQueue'
+SCHEDULER_MEMORY_QUEUE = 'scrapy.squeues.FifoMemoryQueue'
+
 SPIDER_MIDDLEWARES = {
     'scrapy_link_filter.middleware.LinkFilterMiddleware': 950,
     'autoextract_spiders.middlewares.SchedulerSpiderMiddleware': 0,
@@ -53,6 +61,9 @@ DOWNLOADER_MIDDLEWARES = {
     'scrapy_count_filter.middleware.HostsCountFilterMiddleware': 542,
     'scrapy_autoextract.middlewares.AutoExtractMiddleware': 543,
 }
+
+# Custom filter to allow fingerprinting prefix customization
+DUPEFILTER_CLASS = 'autoextract_spiders.dupe_filter.DupeFilter'
 
 AUTOEXTRACT_USER = '[API key]'
 

@@ -11,7 +11,8 @@ from ..middlewares import reset_scheduler_on_disabled_frontera
 from ..sessions import crawlera_session, update_redirect_middleware
 from .rule import Rule
 from .autoextract_spider import AutoExtractSpider
-from .util import is_valid_url, utc_iso_date, is_autoextract_request
+from .util import is_valid_url, utc_iso_date, is_autoextract_request, \
+    FingerprintPrefix
 
 META_TO_KEEP = ('source_url',)
 
@@ -235,11 +236,17 @@ class CrawlerSpider(AutoExtractSpider):
                 continue
             # Initial request to the seed URL
             self.crawler.stats.inc_value('x_request/seeds')
-            yield Request(url,
+            request = Request(url,
                           meta={'source_url': url},
                           callback=self.main_callback,
                           errback=self.main_errback,
                           dont_filter=True)
+            # Trick required to avoid some seeds to be never processed or too late.
+            try:
+                self.crawler.engine.crawl(request, self)
+            except AssertionError:
+                yield request
+
 
     def parse_page(self, response):
         """
@@ -273,11 +280,12 @@ class CrawlerSpider(AutoExtractSpider):
             # Make another request to fetch the full page HTML
             # Risk of being banned
             self.crawler.stats.inc_value('x_request/discovery')
+            meta = {'source_url': response.meta['source_url'],
+                    'fingerprint_prefix': FingerprintPrefix.SCRAPY.value}
             request = Request(response.url,
-                          meta={'source_url': response.meta['source_url']},
+                          meta=meta,
                           callback=self.main_callback,
-                          errback=self.main_errback,
-                          dont_filter=True)
+                          errback=self.main_errback)
             yield crawlera_session.init_request(request)
 
     def _rule_process_links(self, links):

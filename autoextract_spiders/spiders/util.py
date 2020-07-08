@@ -1,6 +1,7 @@
 import os
 import re
 import logging
+from enum import Enum
 from typing import Iterable
 from urllib.parse import urlsplit
 from datetime import datetime, timezone
@@ -190,3 +191,12 @@ def _load_jl(data: str) -> Iterable:
                 yield {'url': line}
             else:
                 logger.warning('Invalid source URL: %s', line)
+
+
+class FingerprintPrefix(Enum):
+    """
+    Prefixes to use in fingerprinting given the type of request performed.
+    Allows to have independent deduplication for Scrapy and AutoExtract requests.
+    """
+    SCRAPY = 's'  # For Scrapy requests
+    AUTOEXTRACT = 'a'  # For AutoExtract requests
