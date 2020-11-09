@@ -120,7 +120,7 @@ Running the spiders requires installing [Scrapy](https://scrapy.readthedocs.io/)
 To run the articles spider, discovery and extraction:
 
 ```sh
-> scrapy crawl articles -s AUTOEXTRACT_USER=<your API key> -a seeds=<one or more seed urls> -a threshold=.5
+> scrapy crawl articles -s AUTOEXTRACT_USER=<your API key> -a seeds=<one or more seed urls> -a threshold=.5 -s FRONTERA_DISABLED=True
 ```
 
 In this example, the spider will ignore articles that have a probability lower than 0.5.
@@ -128,10 +128,12 @@ In this example, the spider will ignore articles that have a probability lower t
 To run the products spider, discovery and extraction:
 
 ```sh
-> scrapy crawl products -s AUTOEXTRACT_USER=<your API key> -a seeds=<one or more seed urls> -a max-items=10
+> scrapy crawl products -s AUTOEXTRACT_USER=<your API key> -a seeds=<one or more seed urls> -a max-items=10 -s FRONTERA_DISABLED=True
 ```
 
 In this example, the spider will stop processing requests after extracting 10 items.
+
+**Note:** remove ``-s FRONTERA_DISABLED=True`` from the former commands to use Frontera.
 
 
 ## Deploy on Scrapy Cloud
